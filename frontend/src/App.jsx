@@ -11,6 +11,7 @@ export default function App() {
   const [analysis, setAnalysis] = useState(null);
   const [targetColumn, setTargetColumn] = useState("");
   const [imputationStrategy, setImputationStrategy] = useState("mean_median");
+  const [selectedScaling, setSelectedScaling] = useState("none");
   const [trainResult, setTrainResult] = useState(null);
   const [training, setTraining] = useState(false);
   const [downloading, setDownloading] = useState(false);
@@ -32,7 +33,7 @@ export default function App() {
     setDownloading(true);
     setGlobalError("");
     try {
-      await downloadCleanedCsv(file, targetColumn, imputationStrategy);
+      await downloadCleanedCsv(file, targetColumn, imputationStrategy, selectedScaling);
     } catch (e) {
       setGlobalError(e.message || "CSV download failed");
     } finally {
@@ -45,7 +46,7 @@ export default function App() {
     setTraining(true);
     setGlobalError("");
     try {
-      const result = await processAndTrain(file, targetColumn, imputationStrategy);
+      const result = await processAndTrain(file, targetColumn, imputationStrategy, selectedScaling);
       setTrainResult(result);
     } catch (e) {
       setGlobalError(e.message || "Training failed");
@@ -86,6 +87,8 @@ export default function App() {
           setTargetColumn={setTargetColumn}
           imputationStrategy={imputationStrategy}
           setImputationStrategy={setImputationStrategy}
+          selectedScaling={selectedScaling}
+          setSelectedScaling={setSelectedScaling}
           onTrain={handleTrain}
           training={training}
         />

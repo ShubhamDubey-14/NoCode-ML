@@ -18,11 +18,12 @@ export async function analyzeCsv(file) {
   return res.json();
 }
 
-export async function processAndTrain(file, targetColumn, imputationStrategy) {
+export async function processAndTrain(file, targetColumn, imputationStrategy, scalingMethod = "none") {
   const form = new FormData();
   form.append("file", file);
   form.append("target_column", targetColumn);
   form.append("imputation_strategy", imputationStrategy);
+  form.append("scaling_method", scalingMethod);
   const res = await fetch(`${API_BASE}/api/process-and-train`, {
     method: "POST",
     body: form,
@@ -37,11 +38,12 @@ export function modelDownloadUrl(modelId) {
   return `${API_BASE}/api/download-model/${modelId}`;
 }
 
-export async function downloadCleanedCsv(file, targetColumn, imputationStrategy) {
+export async function downloadCleanedCsv(file, targetColumn, imputationStrategy, scalingMethod = "none") {
   const form = new FormData();
   form.append("file", file);
   form.append("target_column", targetColumn);
   form.append("imputation_strategy", imputationStrategy);
+  form.append("scaling_method", scalingMethod);
   const res = await fetch(`${API_BASE}/api/download-cleaned-csv`, {
     method: "POST",
     body: form,

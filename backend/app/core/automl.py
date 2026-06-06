@@ -164,12 +164,15 @@ def train_automl_pipeline(
     df: pd.DataFrame,
     target_column: str,
     imputation_strategy: str,
+    scaling_method: str = "none",
 ) -> dict[str, Any]:
     """
     Full AutoML flow: preprocess → baselines → Optuna → save Pipeline.
     Returns metrics and model_id for the API layer.
+    
+    scaling_method: 'none' | 'standardize' (Z-Score) | 'normalize' (MinMax [0,1])
     """
-    X, y_raw, preprocessor = build_preprocessor(df, target_column, imputation_strategy)
+    X, y_raw, preprocessor = build_preprocessor(df, target_column, imputation_strategy, scaling_method)
     y, _target_encoder = encode_target(y_raw)
 
     if y.nunique() < 2:

@@ -73,6 +73,7 @@ async def process_and_train(
     file: UploadFile = File(...),
     target_column: str = Form(...),
     imputation_strategy: str = Form(...),
+    scaling_method: str = Form(default="none"),
 ) -> dict[str, Any]:
     """Preprocess data, run AutoML, persist pipeline, return metrics."""
     if imputation_strategy not in ("mean_median", "drop"):
@@ -80,9 +81,14 @@ async def process_and_train(
             status_code=400,
             detail="imputation_strategy must be 'mean_median' or 'drop'.",
         )
+    if scaling_method not in ("none", "standardize", "normalize"):
+        raise HTTPException(
+            status_code=400,
+            detail="scaling_method must be 'none', 'standardize', or 'normalize'.",
+        )
     df = _read_csv(file)
     try:
-        result = train_automl_pipeline(df, target_column, imputation_strategy)
+        result = train_automl_pipeline(df, target_column, imputation_strategy, scaling_method)
     except ValueError as exc:
         raise HTTPException(status_code=400, detail=str(exc)) from exc
     except Exception as exc:
@@ -95,12 +101,21 @@ async def download_cleaned_csv(
     file: UploadFile = File(...),
     target_column: str = Form(...),
     imputation_strategy: str = Form(...),
+    scaling_method: str = Form(default="none"),
 ) -> Response:
-    """Return cleaned/imputed dataset as CSV (same rules as training preprocessing)."""
+    """Return cleaned/imputed dataset as CSV (same rules as training preprocessing).
+    
+    Note: Downloaded CSV is unscaled for human readability. Scaling is only applied during model training.
+    """
     if imputation_strategy not in ("mean_median", "drop"):
         raise HTTPException(
             status_code=400,
             detail="imputation_strategy must be 'mean_median' or 'drop'.",
+        )
+    if scaling_method not in ("none", "standardize", "normalize"):
+        raise HTTPException(
+            status_code=400,
+            detail="scaling_method must be 'none', 'standardize', or 'normalize'.",
         )
     df = _read_csv(file)
     try:

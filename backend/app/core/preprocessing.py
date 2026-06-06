@@ -6,7 +6,7 @@ import pandas as pd
 from sklearn.compose import ColumnTransformer
 from sklearn.impute import SimpleImputer
 from sklearn.pipeline import Pipeline
-from sklearn.preprocessing import OneHotEncoder, OrdinalEncoder
+from sklearn.preprocessing import OneHotEncoder, OrdinalEncoder, StandardScaler, MinMaxScaler
 
 
 def _is_id_like(series: pd.Series) -> bool:
@@ -98,11 +98,13 @@ def build_preprocessor(
     df: pd.DataFrame,
     target_column: str,
     imputation_strategy: str,
+    scaling_method: str = "none",
 ) -> tuple[pd.DataFrame, pd.Series, ColumnTransformer]:
     """
-    Separate X/y, drop ID-like columns, impute, and build a ColumnTransformer.
+    Separate X/y, drop ID-like columns, impute, scale, and build a ColumnTransformer.
 
     imputation_strategy: 'mean_median' | 'drop'
+    scaling_method: 'none' | 'standardize' (Z-Score) | 'normalize' (MinMax [0,1])
     """
     X, y_raw, _id_cols = _split_xy(df, target_column)
     X = _coerce_numeric_columns(X)
@@ -130,6 +132,14 @@ def build_preprocessor(
         num_steps: list[tuple] = []
         if imputation_strategy == "mean_median":
             num_steps.append(("imputer", SimpleImputer(strategy="median")))
+        
+        # Add scaling based on user selection
+        if scaling_method == "standardize":
+            num_steps.append(("scaler", StandardScaler()))
+        elif scaling_method == "normalize":
+            num_steps.append(("scaler", MinMaxScaler()))
+        # If scaling_method == "none", no scaler is added
+        
         transformers.append(
             ("num", Pipeline(num_steps) if num_steps else "passthrough", numeric_cols)
         )

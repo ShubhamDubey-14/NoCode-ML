@@ -6,6 +6,8 @@ export default function DataPreview({
   setTargetColumn,
   imputationStrategy,
   setImputationStrategy,
+  selectedScaling,
+  setSelectedScaling,
   onTrain,
   training,
 }) {
@@ -98,6 +100,45 @@ export default function DataPreview({
               <option value="drop">Drop rows with missing values</option>
             </select>
           </label>
+
+          <div className="space-y-2">
+            <span className="block text-sm font-semibold">Feature Scaling</span>
+            <div className="flex gap-2">
+              <button
+                type="button"
+                onClick={() => setSelectedScaling("standardize")}
+                className={`flex-1 rounded-lg border-2 px-4 py-3 font-semibold transition ${
+                  selectedScaling === "standardize"
+                    ? "border-indigo-500 bg-indigo-50 text-indigo-700 dark:bg-indigo-950/40 dark:text-indigo-300"
+                    : "border-slate-300 bg-white text-slate-700 hover:border-indigo-300 dark:border-slate-600 dark:bg-slate-800 dark:text-slate-300 dark:hover:border-indigo-400"
+                }`}
+              >
+                Z-Score Standardization
+              </button>
+              <button
+                type="button"
+                onClick={() => setSelectedScaling("normalize")}
+                className={`flex-1 rounded-lg border-2 px-4 py-3 font-semibold transition ${
+                  selectedScaling === "normalize"
+                    ? "border-emerald-500 bg-emerald-50 text-emerald-700 dark:bg-emerald-950/40 dark:text-emerald-300"
+                    : "border-slate-300 bg-white text-slate-700 hover:border-emerald-300 dark:border-slate-600 dark:bg-slate-800 dark:text-slate-300 dark:hover:border-emerald-400"
+                }`}
+              >
+                MinMax Normalization
+              </button>
+              <button
+                type="button"
+                onClick={() => setSelectedScaling("none")}
+                className={`flex-1 rounded-lg border-2 px-4 py-3 font-semibold transition ${
+                  selectedScaling === "none"
+                    ? "border-slate-500 bg-slate-100 text-slate-700 dark:bg-slate-700 dark:text-slate-100"
+                    : "border-slate-300 bg-white text-slate-700 hover:border-slate-400 dark:border-slate-600 dark:bg-slate-800 dark:text-slate-300 dark:hover:border-slate-500"
+                }`}
+              >
+                No Scaling
+              </button>
+            </div>
+          </div>
         </div>
       </div>
 
